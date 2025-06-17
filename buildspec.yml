@@ -45,13 +45,13 @@ phases:
       - echo Replacing image placeholders in Kubernetes manifests...
       - mkdir -p k8s-out/Frontend k8s-out/Backend
 
-      - sed "s|IMAGE_PLACEHOLDER|${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$FRONTEND_REPO:$IMAGE_TAG|g" \
-        $K8S_MANIFEST_DIR/Frontend/deployment.yaml > k8s-out/Frontend/deployment.yaml
+      - mkdir -p k8s-out/Frontend k8s-out/Backend
+      - sed "s|IMAGE_PLACEHOLDER|${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$FRONTEND_REPO:$IMAGE_TAG|g" $K8S_MANIFEST_DIR/Frontend/deployment.yaml > k8s-out/Frontend/deployment.yaml
       - cp $K8S_MANIFEST_DIR/Frontend/service.yaml k8s-out/Frontend/service.yaml
 
-      - sed "s|IMAGE_PLACEHOLDER|${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$BACKEND_REPO:$IMAGE_TAG|g" \
-        $K8S_MANIFEST_DIR/Backend/deployment.yaml > k8s-out/Backend/deployment.yaml
+      - sed "s|IMAGE_PLACEHOLDER|${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$BACKEND_REPO:$IMAGE_TAG|g" $K8S_MANIFEST_DIR/Backend/deployment.yaml > k8s-out/Backend/deployment.yaml
       - cp $K8S_MANIFEST_DIR/Backend/service.yaml k8s-out/Backend/service.yaml
+
 
       - echo Including database and ingress manifests...
       - mkdir -p k8s-out/Database
