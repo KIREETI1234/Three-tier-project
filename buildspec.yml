@@ -43,25 +43,51 @@ phases:
       - docker push ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$BACKEND_REPO:$IMAGE_TAG
 
       - echo Replacing image placeholders in Kubernetes manifests...
-      - mkdir -p k8s-out/Frontend k8s-out/Backend
+      - mkdir -p k8s-out/Frontend k8s-out/Backend k8s-out/Database
 
-      - mkdir -p k8s-out/Frontend k8s-out/Backend
+      # Replace frontend image
       - sed "s|IMAGE_PLACEHOLDER|${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$FRONTEND_REPO:$IMAGE_TAG|g" $K8S_MANIFEST_DIR/Frontend/deployment.yaml > k8s-out/Frontend/deployment.yaml
       - cp $K8S_MANIFEST_DIR/Frontend/service.yaml k8s-out/Frontend/service.yaml
 
+      # Replace backend image
       - sed "s|IMAGE_PLACEHOLDER|${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$BACKEND_REPO:$IMAGE_TAG|g" $K8S_MANIFEST_DIR/Backend/deployment.yaml > k8s-out/Backend/deployment.yaml
       - cp $K8S_MANIFEST_DIR/Backend/service.yaml k8s-out/Backend/service.yaml
 
-
-      - echo Including database and ingress manifests...
-      - mkdir -p k8s-out/Database
+      # Copy DB manifests
       - cp $K8S_MANIFEST_DIR/Database/*.yaml k8s-out/Database/
-      - cp $K8S_MANIFEST_DIR/ingress.yaml k8s-out/
 
-      - echo Aggregating all manifest files into root of k8s-out/ for CodePipeline...
-      - cp k8s-out/Frontend/*.yaml k8s-out/
-      - cp k8s-out/Backend/*.yaml k8s-out/
+      # Copy ingress
+      - cp $K8S_MANIFEST_DIR/ingress.yaml k8s-out/ingress.yaml
+
+      # Flatten for CodePipeline deploy stage
+      - cp k8s-out/Frontend/deployment.yaml k8s-out/deployment-frontend.yaml
+      - cp k8s-out/Frontend/service.yaml k8s-out/service-frontend.yaml
+      - cp k8s-out/Backend/deployment.yaml k8s-out/deployment-backend.yaml
+      - cp k8s-out/Backend/service.yaml k8s-out/service-backend.yaml
       - cp k8s-out/Database/*.yaml k8s-out/
+      - cp k8s-out/ingress.yaml k8s-out/
+
+
+      # - echo Replacing image placeholders in Kubernetes manifests...
+      # - mkdir -p k8s-out/Frontend k8s-out/Backend
+
+      # - mkdir -p k8s-out/Frontend k8s-out/Backend
+      # - sed "s|IMAGE_PLACEHOLDER|${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$FRONTEND_REPO:$IMAGE_TAG|g" $K8S_MANIFEST_DIR/Frontend/deployment.yaml > k8s-out/Frontend/deployment.yaml
+      # - cp $K8S_MANIFEST_DIR/Frontend/service.yaml k8s-out/Frontend/service.yaml
+
+      # - sed "s|IMAGE_PLACEHOLDER|${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$BACKEND_REPO:$IMAGE_TAG|g" $K8S_MANIFEST_DIR/Backend/deployment.yaml > k8s-out/Backend/deployment.yaml
+      # - cp $K8S_MANIFEST_DIR/Backend/service.yaml k8s-out/Backend/service.yaml
+
+
+      # - echo Including database and ingress manifests...
+      # - mkdir -p k8s-out/Database
+      # - cp $K8S_MANIFEST_DIR/Database/*.yaml k8s-out/Database/
+      # - cp $K8S_MANIFEST_DIR/ingress.yaml k8s-out/
+
+      # - echo Aggregating all manifest files into root of k8s-out/ for CodePipeline...
+      # - cp k8s-out/Frontend/*.yaml k8s-out/
+      # - cp k8s-out/Backend/*.yaml k8s-out/
+      # - cp k8s-out/Database/*.yaml k8s-out/
 
 artifacts:
   base-directory: k8s-out
