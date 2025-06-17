@@ -1,4 +1,4 @@
-FROM public.ecr.aws/nodejs/node:14
+FROM public.ecr.aws/docker/library/node:14
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
